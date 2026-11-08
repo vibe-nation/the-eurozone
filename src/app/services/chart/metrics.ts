@@ -25,8 +25,7 @@ export function metricLabel(metric: Metric): string {
   return metric.measure ? `${metric.name} (${metric.measure})` : metric.name;
 }
 
-const EUROZONE = 'Еврозоната';
-
+/* The euro area as a whole: its series stay in the data, off the page. */
 const EUROZONE_CODE = 'ea21';
 
 const COUNTRY_NAMES = new Map([
@@ -85,7 +84,7 @@ const LINE_COLORS = [
   '#00acc1',
 ];
 
-const COUNTRY_ORDER = [...COUNTRY_NAMES.values(), EUROZONE].sort((a, b) => a.localeCompare(b, 'bg'));
+const COUNTRY_ORDER = [...COUNTRY_NAMES.values()].sort((a, b) => a.localeCompare(b, 'bg'));
 
 /* Longest id first: `gdp-per-capita-in-pps-…` also starts with `gdp-`. */
 const BY_LONGEST_ID = [...ALL_METRICS].sort((a, b) => b.id.length - a.id.length);
@@ -96,7 +95,7 @@ export function metricOf(seriesId: string): Metric | undefined {
 
 /** Whether a series belongs on the page. */
 export function isOffered(seriesId: string): boolean {
-  return !metricOf(seriesId)?.hidden;
+  return !metricOf(seriesId)?.hidden && !seriesId.endsWith(`-${EUROZONE_CODE}`);
 }
 
 /** The country's Bulgarian name. */
@@ -104,7 +103,7 @@ export function countryOf(seriesId: string): string {
   const metric = metricOf(seriesId);
   const code = metric ? seriesId.slice(metric.id.length + 1) : seriesId;
 
-  return code === EUROZONE_CODE ? EUROZONE : (COUNTRY_NAMES.get(code) ?? code);
+  return COUNTRY_NAMES.get(code) ?? code;
 }
 
 export function seriesLabel(seriesId: string): string {

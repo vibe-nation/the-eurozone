@@ -308,7 +308,7 @@ export class IndexComponent implements OnInit {
     return Object.fromEntries(rows.flatMap((row) => row.ids.map((id) => [id, shown])));
   }
 
-  /** By name: a legend row is a series and a search pick a timeline row, and the name is what they share. The eurozone as a whole has no timeline row. */
+  /** By name: a legend row is a series and a search pick a timeline row, and the name is what they share. */
   private withSearched(rows: LegendRow[], on: boolean): ReadonlySet<string> {
     const names = new Set(rows.map((row) => row.name));
     const searched = new Set(this.searched);
