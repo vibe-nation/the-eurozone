@@ -120,10 +120,16 @@ export class CountrySearchComponent {
 
     if (!picks.delete(id)) {
       picks.add(id);
-      this.setRecent([id, ...this.recent().filter((other) => other !== id)].slice(0, MAX_RECENT));
+      this.addRecent(id);
     }
 
     this.picked.set(picks);
+  }
+
+  /** A pick made outside the list, which is shut by then, so its rows can take the pick at once. */
+  remember(id: string): void {
+    this.addRecent(id);
+    this.listedRecent.set(this.recent());
   }
 
   protected clear(): void {
@@ -204,6 +210,10 @@ export class CountrySearchComponent {
     this.open.set(false);
     this.active.set(-1);
     this.listedRecent.set(this.recent());
+  }
+
+  private addRecent(id: string): void {
+    this.setRecent([id, ...this.recent().filter((other) => other !== id)].slice(0, MAX_RECENT));
   }
 
   private setRecent(recent: readonly string[]): void {

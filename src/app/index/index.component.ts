@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, HostListener, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit, ChangeDetectionStrategy, viewChild } from '@angular/core';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import * as echarts from 'echarts/core';
 import { CustomChart, LineChart } from 'echarts/charts';
@@ -80,6 +80,7 @@ export class IndexComponent implements OnInit {
   /** The ids of the countries chosen in the search. */
   public searched: ReadonlySet<string> = new Set();
 
+  private readonly search = viewChild.required(CountrySearchComponent);
   private bars: any[] = [];
   private selection: Record<string, boolean> = {};
   private narrow = window.innerWidth < NARROW_WIDTH_PX;
@@ -290,7 +291,10 @@ export class IndexComponent implements OnInit {
 
   /** Switched on in the legend, a country is selected as the search selects it; switched off, it is let go. */
   toggleCountry(row: LegendRow): void {
-    this.applySelection({ ...this.selection, ...this.switched([row], !row.shown) }, this.withSearched([row], !row.shown));
+    const searched = this.withSearched([row], !row.shown);
+
+    [...searched].filter((id) => !this.searched.has(id)).forEach((id) => this.search().remember(id));
+    this.applySelection({ ...this.selection, ...this.switched([row], !row.shown) }, searched);
   }
 
   /** Hiding all lets go of the countries that were on show; showing all selects none, as every row would be lit. */
