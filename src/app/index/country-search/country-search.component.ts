@@ -3,28 +3,28 @@ import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, input
 const RECENT_STORAGE_KEY = 'euro.recentCountries';
 const MAX_RECENT = 5;
 
-const tidied = (text: string): string => text.trim().replace(/\s+/g, ' ');
+export const tidied = (text: string): string => text.trim().replace(/\s+/g, ' ');
 const folded = (text: string): string => tidied(text).toLocaleLowerCase('bg');
 
 /** Whether a name holds every word of the query, in any order. */
-const matchesQuery = (name: string, query: string): boolean =>
+export const matchesQuery = (name: string, query: string): boolean =>
   folded(query)
     .split(' ')
     .every((word) => folded(name).includes(word));
 
-function readRecent(): string[] {
+export function readRecent(key: string, max: number): string[] {
   try {
-    const parsed: unknown = JSON.parse(localStorage.getItem(RECENT_STORAGE_KEY) ?? '[]');
+    const parsed: unknown = JSON.parse(localStorage.getItem(key) ?? '[]');
 
-    return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string').slice(0, MAX_RECENT) : [];
+    return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string').slice(0, max) : [];
   } catch {
     return [];
   }
 }
 
-function storeRecent(recent: readonly string[]): void {
+export function storeRecent(key: string, recent: readonly string[]): void {
   try {
-    localStorage.setItem(RECENT_STORAGE_KEY, JSON.stringify(recent));
+    localStorage.setItem(key, JSON.stringify(recent));
   } catch {
     /* Lost on reload; nothing else depends on it. */
   }
@@ -67,7 +67,7 @@ export class CountrySearchComponent {
   protected readonly open = signal(false);
   /** Index into `options()`; -1 for none. */
   protected readonly active = signal(-1);
-  private readonly recent = signal(readRecent());
+  private readonly recent = signal(readRecent(RECENT_STORAGE_KEY, MAX_RECENT));
   /** The recent picks as the list has them, behind `recent` while it is open. */
   private readonly listedRecent = signal(this.recent());
 
@@ -218,6 +218,6 @@ export class CountrySearchComponent {
 
   private setRecent(recent: readonly string[]): void {
     this.recent.set([...recent]);
-    storeRecent(recent);
+    storeRecent(RECENT_STORAGE_KEY, recent);
   }
 }

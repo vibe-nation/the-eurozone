@@ -1,0 +1,66 @@
+<!-- A label, so a press on the icon or the padding lands in the text. -->
+<label class="search-field" [class.is-miss]="miss()">
+  <svg class="flex-none" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+    <circle cx="7" cy="7" r="4.6" fill="none" stroke="currentColor" stroke-width="1.5" />
+    <path d="M10.5 10.5 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+  </svg>
+  <input
+    #field
+    type="text"
+    class="search-input"
+    placeholder="Търси показател…"
+    aria-label="Търси показател"
+    autocomplete="off"
+    role="combobox"
+    aria-autocomplete="list"
+    aria-controls="metric-search-list"
+    [attr.aria-expanded]="shown()"
+    [attr.aria-activedescendant]="active() >= 0 ? 'metric-search-option-' + active() : null"
+    [value]="text()"
+    (input)="onInput($event)"
+    (focus)="openList()"
+    (click)="openList()"
+    (keydown)="onKeydown($event)"
+  />
+  <span class="search-count" aria-live="polite">{{ count() }}</span>
+  @if (clearable()) {
+    <button type="button" class="search-clear" aria-label="Изчисти търсенето и избора" title="Изчисти търсенето и избора" (mousedown)="$event.preventDefault()" (click)="clear(); field.focus()">✕</button>
+  }
+</label>
+
+@if (shown()) {
+  <ul class="search-list" id="metric-search-list" role="listbox" aria-label="Показатели" aria-multiselectable="true" (mousedown)="$event.preventDefault()">
+    @for (option of options(); track option.id; let index = $index) {
+      @if (index === 0 && option.recent) {
+        <li class="search-list-head" role="presentation">
+          <span>Последни търсения</span>
+          <button type="button" class="search-list-forget" title="Забрави последните търсения" (click)="forgetRecent(); field.focus()">Изчисти</button>
+        </li>
+      }
+      @if (index === recentCount() && recentCount() > 0) {
+        <li class="search-list-divider" role="presentation"></li>
+      }
+      <li role="presentation">
+        <button
+          type="button"
+          class="search-option"
+          role="option"
+          tabindex="-1"
+          [id]="'metric-search-option-' + index"
+          [class.is-active]="active() === index"
+          [class.is-picked]="option.picked"
+          [attr.aria-selected]="option.picked"
+          (click)="pick(option.id)"
+          (mouseenter)="active.set(index)"
+        >
+          <span class="search-option-check" aria-hidden="true">
+            <svg viewBox="0 0 12 12" width="10" height="10">
+              <path d="M2.5 6 L5 8.5 L9.5 3.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <span class="min-w-0">{{ option.label }}</span>
+        </button>
+      </li>
+    }
+  </ul>
+}

@@ -1,16 +1,6 @@
 {
   "default": {
-    "series": [
-      "berlin-wall-fall",
-      "zhivkov-ousted",
-      "bulgaria-nato",
-      "bulgaria-eu",
-      "global-financial-crisis",
-      "covid",
-      "war-russia-ukraine",
-      "war-iran",
-      "deficit-surplus-bg"
-    ],
+    "series": ["berlin-wall-fall", "covid", "deficit-surplus-bg"],
     "currency": "EUR",
     "magnitude": "1000000",
     "switches": {

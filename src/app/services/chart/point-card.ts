@@ -29,9 +29,9 @@ export interface PointCard {
   mark: { coord: [string, number]; color: string; yAxisIndex: number };
 }
 
-/* Months for the monthly series; a year's point is dated by its last day, which says nothing. */
-function periodOf(chart: any, date: string): string {
-  return chart.dataset.selection.freq.code === 'A' ? `${date.slice(0, 4)} г.` : moment(date).format('MMMM YYYY г.');
+/* Months for the monthly series; a year's point is dated by its last day, which says nothing. A newer point from a shorter-period dataset does carry a real month. */
+function periodOf(chart: any, point: any): string {
+  return chart.dataset.selection.freq.code === 'A' && !point.dataset ? `${point.date.slice(0, 4)} г.` : moment(point.date).format('MMMM YYYY г.');
 }
 
 export function pointCard(chart: any, date: string, money: MoneyView, flag: string | null): PointCard {
@@ -43,6 +43,9 @@ export function pointCard(chart: any, date: string, money: MoneyView, flag: stri
   const change = shown(point.change);
   const metric = metricOf(chart.id)!;
   const country = countryOf(chart.id);
+  /* A point appended from another dataset names its own origin; the series' `dataset` describes the rest. */
+  const origin = point.dataset ?? chart.dataset;
+  const options = Object.entries<any>(chart.dataset.selection).filter(([dimension]) => !point.dataset || dimension !== 'freq');
 
   return {
     seriesId: chart.id,
@@ -50,7 +53,7 @@ export function pointCard(chart: any, date: string, money: MoneyView, flag: stri
     metric: metricLabel(metric),
     country,
     flag,
-    period: periodOf(chart, date),
+    period: periodOf(chart, point),
     value: tooltipNumber(value),
     unit,
     change: change
@@ -64,10 +67,10 @@ export function pointCard(chart: any, date: string, money: MoneyView, flag: stri
       : null,
     sources: chart.sources.map((source: any) => ({ name: source.name.bg, url: source.url[0] })),
     eurostat: {
-      dataset: chart.dataset.id,
-      url: chart.sources[0].url[0],
-      updated: humanDate(chart.dataset.updated),
-      rows: Object.values<any>(chart.dataset.selection).map((item) => ({ option: item.label.en, code: item.code, meaning: item.description })),
+      dataset: origin.id,
+      url: chart.sources.find((source: any) => source.dataset_id === origin.id).url[0],
+      updated: humanDate(origin.updated),
+      rows: options.map(([, item]) => ({ option: item.label.en, code: item.code, meaning: item.description })),
     },
     mark: { coord: [date, value], color: countryColor(country), yAxisIndex: valueAxisIndex(chart.unit) },
   };

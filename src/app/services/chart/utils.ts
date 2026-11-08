@@ -1,7 +1,7 @@
 import { convertCurrency } from '../utils';
 import Decimal from 'decimal.js';
 import { ValueAxes, valueAxisIndex } from './chart';
-import { buildEventSeries, buildGanttChart, buildLineChart, buildCurrentDateLine, euroEntryLines, zeroLines } from './series';
+import { buildEventSeries, buildGanttChart, buildLineChart, buildCurrentDateLine, euroEntryLines, referenceLines } from './series';
 
 export function convertMoneyCharts(series: any, moneyCharts: any, toCurrency: any, toMagnitude: any) {
   series.forEach((series: any) => {
@@ -44,13 +44,19 @@ export function convertMoneyCharts(series: any, moneyCharts: any, toCurrency: an
   return series;
 }
 
-export function buildSeries(events: any, gantt: any, charts: any, view: { showLabels: boolean; smallPoints: boolean; axes: ValueAxes }, euroEntries: readonly number[]) {
+export function buildSeries(
+  events: any,
+  gantt: any,
+  charts: any,
+  view: { showLabels: boolean; smallPoints: boolean; axes: ValueAxes },
+  euroEntries: readonly number[]
+) {
   const { showLabels, smallPoints, axes } = view;
   const series: any = [];
 
   series.push(buildCurrentDateLine());
   series.push(buildCurrentDateLine(1));
-  series.push(...zeroLines(axes));
+  series.push(...referenceLines(axes));
 
   events.forEach((event: any) => {
     series.push(buildEventSeries(event, 0));

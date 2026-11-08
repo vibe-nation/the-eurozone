@@ -71,7 +71,15 @@ export interface ValueAxes {
   percent: boolean;
   index: boolean;
   money: boolean;
+  /** A deficit line in % of GDP is on, so its limit is drawn and kept in view. */
+  deficitLimit: boolean;
 }
+
+/** The EU's limit on a deficit, in % of GDP. */
+export const DEFICIT_LIMIT_PERCENT = -3;
+
+/* One below the limit when the lines stop short of it, so it doesn't lie on the axis's edge; left to ECharts otherwise. */
+const reachLimit = ({ min }: { min: number }) => (min > DEFICIT_LIMIT_PERCENT ? DEFICIT_LIMIT_PERCENT - 1 : null);
 
 /** Each unit has its own axis, so an index near 100 is not flattened by a GDP in the millions. */
 export function valueAxisIndex(unit: string): number {
@@ -86,7 +94,7 @@ function moneyAxisOffset(axes: ValueAxes): number {
 export function valueAxesPatch(axes: ValueAxes): any[] {
   return [
     {},
-    { show: axes.percent, splitLine: { show: axes.percent } },
+    { show: axes.percent, splitLine: { show: axes.percent }, min: axes.deficitLimit ? reachLimit : null },
     { show: axes.index, offset: axes.percent ? PERCENT_AXIS_WIDTH_PX : 0, splitLine: { show: axes.index && !axes.percent } },
     { show: axes.money, offset: moneyAxisOffset(axes), splitLine: { show: axes.money && !axes.percent && !axes.index } },
   ];
@@ -188,7 +196,13 @@ export function bigTimeChart(
     tooltip: {
       confine: true,
       transitionDuration: 0,
-      position: (point: [number, number], _params: unknown, _dom: unknown, _rect: unknown, size: { contentSize: [number, number]; viewSize: [number, number] }) => {
+      position: (
+        point: [number, number],
+        _params: unknown,
+        _dom: unknown,
+        _rect: unknown,
+        size: { contentSize: [number, number]; viewSize: [number, number] }
+      ) => {
         const [px, py] = point;
         const [tw, th] = size.contentSize;
         const [vw] = size.viewSize;

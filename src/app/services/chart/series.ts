@@ -1,7 +1,7 @@
 import * as echarts from 'echarts/core';
 import moment from 'moment/moment';
 import { humanDateDiff, humanDate } from '../utils';
-import { ValueAxes, valueAxisIndex } from './chart';
+import { DEFICIT_LIMIT_PERCENT, ValueAxes, valueAxisIndex } from './chart';
 import { countryColor, countryOf, seriesLabel } from './metrics';
 
 const FONT = 'Sofia Sans';
@@ -19,7 +19,7 @@ const BAR_NORMAL = 0;
 const BAR_PICKED = 1;
 const BAR_RELATED = 2;
 const BAR_DIMMED = 3;
-const DIM_FACTOR = 0.35;
+const DIM_FACTOR = 0.55;
 const MIN_PICKED_OPACITY = 0.4;
 const PICKED_GROWTH = 1.2;
 /* A band lies under the bars, a single-day line over them. Among the data lines
@@ -172,7 +172,13 @@ export function ganttWithSelection(data: any[], pick: { rowIndex: number; period
   return data.map((bar) => {
     const { rowIndex, periodIndex } = bar.content;
     const inPickedRow = rowIndex === pick?.rowIndex;
-    const state = !anySelected ? BAR_NORMAL : inPickedRow && periodIndex === pick?.periodIndex ? BAR_PICKED : inPickedRow || searchedRows.has(rowIndex) ? BAR_RELATED : BAR_DIMMED;
+    const state = !anySelected
+      ? BAR_NORMAL
+      : inPickedRow && periodIndex === pick?.periodIndex
+        ? BAR_PICKED
+        : inPickedRow || searchedRows.has(rowIndex)
+          ? BAR_RELATED
+          : BAR_DIMMED;
 
     return { ...bar, value: [...bar.value.slice(0, 6), state] };
   });
@@ -311,7 +317,16 @@ export function buildEventSeries(event: any, axisIndex: number) {
       animation: false,
       symbol: 'none',
       emphasis: { lineStyle: { width: 4 } },
-      label: { show: labelled, position: 'insideEndTop', formatter: '{b}', color: '#333', fontFamily: FONT, fontSize: 12, backgroundColor: 'rgba(255, 255, 255, 0.85)', padding: [1, 3] },
+      label: {
+        show: labelled,
+        position: 'insideEndTop',
+        formatter: '{b}',
+        color: '#333',
+        fontFamily: FONT,
+        fontSize: 12,
+        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+        padding: [1, 3],
+      },
       tooltip: { formatter: dayTooltip },
       data: event.items.filter(isSingleDay).map((item: any) => ({
         name: item.name,
@@ -372,8 +387,42 @@ export function buildCurrentDateLine(axisIndex = 0) {
  * The zero level that a surplus and a deficit are read against. One line: with the
  * percent and money axes both on, their zeros sit at different heights, and the percent one speaks.
  */
-export function zeroLines(axes: ValueAxes) {
-  return [buildZeroLine('zero-line-percent', 1, axes.percent), buildZeroLine('zero-line-money', valueAxisIndex('EUR'), axes.money && !axes.percent)];
+export function referenceLines(axes: ValueAxes) {
+  return [
+    buildZeroLine('zero-line-percent', 1, axes.percent),
+    buildZeroLine('zero-line-money', valueAxisIndex('EUR'), axes.money && !axes.percent),
+    buildDeficitLimit(axes.deficitLimit),
+  ];
+}
+
+/* One line for every country: the limit is the same for all of them. */
+function buildDeficitLimit(shown: boolean) {
+  return {
+    id: 'deficit-limit',
+    type: 'line',
+    data: [],
+    markLine: {
+      z: 1,
+      silent: true,
+      animation: false,
+      symbol: 'none',
+      label: {
+        show: true,
+        position: 'insideStart',
+        formatter: `Праг: ${DEFICIT_LIMIT_PERCENT}%`,
+        fontFamily: FONT,
+        fontSize: 12,
+        color: '#1f2937',
+        backgroundColor: '#ffffff',
+        padding: [1, 4],
+      },
+      lineStyle: { color: '#ff0000', type: 'dotted', width: 2 },
+      blur: { lineStyle: { opacity: 1 }, label: { opacity: 1 } },
+      data: shown ? [{ yAxis: DEFICIT_LIMIT_PERCENT }] : [],
+    },
+    xAxisIndex: 1,
+    yAxisIndex: 1,
+  };
 }
 
 function buildZeroLine(id: string, yAxisIndex: number, shown: boolean) {

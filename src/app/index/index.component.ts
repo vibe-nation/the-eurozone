@@ -2,25 +2,44 @@ import { ChangeDetectorRef, Component, HostListener, OnInit, ChangeDetectionStra
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import * as echarts from 'echarts/core';
 import { CustomChart, LineChart } from 'echarts/charts';
-import { DataZoomComponent, GridComponent, LegendComponent, MarkAreaComponent, MarkLineComponent, MarkPointComponent, TooltipComponent } from 'echarts/components';
+import {
+  DataZoomComponent,
+  GridComponent,
+  LegendComponent,
+  MarkAreaComponent,
+  MarkLineComponent,
+  MarkPointComponent,
+  TooltipComponent,
+} from 'echarts/components';
 import { ECharts } from 'echarts';
 import { DataService } from '../services/data.service';
 import { forkJoin } from 'rxjs';
 import { convertMoneyCharts, buildSeries } from '../services/chart/utils';
 import { CanvasRenderer } from 'echarts/renderers';
-import { LucideEuro } from '@lucide/angular';
 import { loadData, buildSavePayload } from '../services/utils';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NARROW_WIDTH_PX, ValueAxes, bigTimeChart, gridLeftPatch, gridRight, valueAxesPatch, timeTickCount } from '../services/chart/chart';
 import { METRICS, countryColor, countryOf, isOffered, metricLabel, metricOf } from '../services/chart/metrics';
 import { PointCard, pickedPointSeries, pointCard } from '../services/chart/point-card';
-import { GANTT_SERIES_ID, euroEntryLines, ganttWithSelection, inMenuOrder, periodSpan, pointStyle, zeroLines } from '../services/chart/series';
+import { GANTT_SERIES_ID, euroEntryLines, ganttWithSelection, inMenuOrder, periodSpan, pointStyle, referenceLines } from '../services/chart/series';
 import { DetailPanelComponent } from './detail-panel/detail-panel.component';
 import { PointPanelComponent } from './point-panel/point-panel.component';
 import { CountrySearchComponent, SearchCountry } from './country-search/country-search.component';
 import { EventToggle, EventsMenuComponent } from './events-menu/events-menu.component';
+import { MetricSearchComponent } from './metric-search/metric-search.component';
 
-echarts.use([GridComponent, CanvasRenderer, LegendComponent, LineChart, CustomChart, DataZoomComponent, TooltipComponent, MarkAreaComponent, MarkLineComponent, MarkPointComponent]);
+echarts.use([
+  GridComponent,
+  CanvasRenderer,
+  LegendComponent,
+  LineChart,
+  CustomChart,
+  DataZoomComponent,
+  TooltipComponent,
+  MarkAreaComponent,
+  MarkLineComponent,
+  MarkPointComponent,
+]);
 
 const DEFAULT_METRIC = METRICS[0].id;
 const MS_PER_YEAR = 365.25 * 24 * 60 * 60 * 1000;
@@ -43,7 +62,7 @@ interface LegendRow {
 
 @Component({
   selector: 'app-index',
-  imports: [NgxEchartsDirective, LucideEuro, DetailPanelComponent, PointPanelComponent, CountrySearchComponent, EventsMenuComponent],
+  imports: [NgxEchartsDirective, DetailPanelComponent, PointPanelComponent, CountrySearchComponent, EventsMenuComponent, MetricSearchComponent],
   templateUrl: './index.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [provideEchartsCore({ echarts })],
@@ -79,6 +98,11 @@ export class IndexComponent implements OnInit {
   public countries: SearchCountry[] = [];
   /** The ids of the countries chosen in the search. */
   public searched: ReadonlySet<string> = new Set();
+
+  /** The chosen metrics, in the menu's order. */
+  public get pickedMetrics() {
+    return this.metrics.filter((metric) => this.activeMetrics.has(metric.id));
+  }
 
   private readonly search = viewChild.required(CountrySearchComponent);
   private bars: any[] = [];
@@ -146,15 +170,21 @@ export class IndexComponent implements OnInit {
 
     this.selection = selected;
     this.refreshRows();
+    this.searched = this.withSearched(
+      this.rows.filter((row) => row.shown),
+      true
+    );
 
     const series = convertMoneyCharts(
-      buildSeries(events, gantt, charts, this.seriesView(), []),
+      buildSeries(events, gantt, charts, this.seriesView(), this.euroEntries()),
       this.convertableCharts,
       this.convert.currency,
       this.convert.magnitude
     );
+    const bars = series.find((item: any) => item.id === GANTT_SERIES_ID);
 
-    this.bars = series.find((item: any) => item.id === GANTT_SERIES_ID).data;
+    this.bars = bars.data;
+    bars.data = ganttWithSelection(this.bars, this.pick, this.searchedRows());
 
     this.chart = bigTimeChart(
       series,
@@ -242,9 +272,18 @@ export class IndexComponent implements OnInit {
     this.setPick(isOpen ? null : { rowIndex, periodIndex });
   }
 
+  /** The legend follows the search: a country selected comes on, one let go goes off. By name, as in `withSearched`. */
   setSearched(searched: ReadonlySet<string>): void {
-    this.searched = searched;
-    this.drawSelection();
+    const rowsIn = (from: ReadonlySet<string>, notIn: ReadonlySet<string>) => {
+      const names = new Set(this.countries.filter((country) => from.has(country.id) && !notIn.has(country.id)).map((country) => country.name));
+
+      return this.rows.filter((row) => names.has(row.name));
+    };
+
+    this.applySelection(
+      { ...this.selection, ...this.switched(rowsIn(searched, this.searched), true), ...this.switched(rowsIn(this.searched, searched), false) },
+      searched
+    );
   }
 
   toggleSearched(id: string): void {
@@ -268,7 +307,11 @@ export class IndexComponent implements OnInit {
   }
 
   private selectionSeries(): any[] {
-    return [{ id: GANTT_SERIES_ID, data: ganttWithSelection(this.bars, this.pick, this.searchedRows()) }, ...euroEntryLines(this.euroEntries()), pickedPointSeries(this.point)];
+    return [
+      { id: GANTT_SERIES_ID, data: ganttWithSelection(this.bars, this.pick, this.searchedRows()) },
+      ...euroEntryLines(this.euroEntries()),
+      pickedPointSeries(this.point),
+    ];
   }
 
   private searchedRows(): Set<number> {
@@ -297,11 +340,9 @@ export class IndexComponent implements OnInit {
     this.applySelection({ ...this.selection, ...this.switched([row], !row.shown) }, searched);
   }
 
-  /** Hiding all lets go of the countries that were on show; showing all selects none, as every row would be lit. */
+  /** The search follows the legend: all of them selected, or none. */
   showAll(shown: boolean): void {
-    const onShow = this.rows.filter((row) => row.shown);
-
-    this.applySelection({ ...this.selection, ...this.switched(this.rows, shown) }, shown ? undefined : this.withSearched(onShow, false));
+    this.applySelection({ ...this.selection, ...this.switched(this.rows, shown) }, this.withSearched(this.rows, shown));
   }
 
   private switched(rows: LegendRow[], shown: boolean): Record<string, boolean> {
@@ -360,11 +401,19 @@ export class IndexComponent implements OnInit {
     }
 
     if (metrics.size) {
-      const countries = new Set(this.rows.filter((row) => row.shown).map((row) => row.name));
-
-      this.activeMetrics = metrics;
-      this.applySelection({ ...this.selection, ...this.linesFor(metrics, countries) });
+      this.setMetrics(metrics);
     }
+  }
+
+  clearMetrics(): void {
+    this.setMetrics(new Set([DEFAULT_METRIC]));
+  }
+
+  private setMetrics(metrics: ReadonlySet<string>): void {
+    const countries = new Set(this.rows.filter((row) => row.shown).map((row) => row.name));
+
+    this.activeMetrics = metrics;
+    this.applySelection({ ...this.selection, ...this.linesFor(metrics, countries) });
   }
 
   /** Every line's state: on for these countries in these metrics, off for the rest. */
@@ -396,7 +445,7 @@ export class IndexComponent implements OnInit {
       legend: { selected: selection },
       yAxis: valueAxesPatch(axes),
       grid: gridLeftPatch(rowNames, axes),
-      series: [...zeroLines(axes), ...(searched || pointGone ? this.selectionSeries() : [])],
+      series: [...referenceLines(axes), ...(searched || pointGone ? this.selectionSeries() : [])],
     });
     this.save();
   }
@@ -429,7 +478,12 @@ export class IndexComponent implements OnInit {
   private shownAxes(): ValueAxes {
     const units = new Set(this.data.charts.filter((chart: any) => this.selection[chart.id]).map((chart: any) => chart.unit));
 
-    return { percent: units.has('percent'), index: units.has('index'), money: units.has('EUR') };
+    return {
+      percent: units.has('percent'),
+      index: units.has('index'),
+      money: units.has('EUR'),
+      deficitLimit: this.data.charts.some((chart: any) => this.selection[chart.id] && metricOf(chart.id)?.id === 'deficit-surplus'),
+    };
   }
 
   private seriesView() {

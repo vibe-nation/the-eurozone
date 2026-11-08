@@ -12,7 +12,8 @@ export interface Metric {
 const ALL_METRICS: Metric[] = [
   { id: 'deficit-surplus', name: 'Дефицит и излишък', measure: '% от БВП' },
   { id: 'deficit-surplus-eur', name: 'Дефицит и излишък', measure: 'евро' },
-  { id: 'government-debt', name: 'Държавен дълг' },
+  { id: 'government-debt', name: 'Държавен дълг', measure: '% от БВП' },
+  { id: 'government-debt-eur', name: 'Държавен дълг', measure: 'евро' },
   { id: 'gdp-per-capita-in-pps', name: 'БВП на човек в СПС', measure: 'ЕС-27 = 100', hidden: true },
   { id: 'gdp', name: 'БВП' },
   { id: 'hicp', name: 'ХИПЦ' },
