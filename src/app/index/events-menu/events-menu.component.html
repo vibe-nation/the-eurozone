@@ -1,0 +1,19 @@
+<button type="button" class="events-trigger" aria-controls="events-menu-panel" [attr.aria-expanded]="open()" (click)="open.set(!open())">
+  Събития
+  <span class="text-gray-500 tabular-nums">{{ shownCount() }}/{{ toggles().length }}</span>
+  <svg class="transition-transform motion-reduce:transition-none" [class.rotate-180]="open()" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true">
+    <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+</button>
+@if (open()) {
+  <div id="events-menu-panel" class="events-panel" role="group" aria-label="Събития">
+    @for (toggle of toggles(); track toggle.id) {
+      <label class="events-item">
+        <input type="checkbox" class="m-0 flex-none accent-ink" [checked]="toggle.shown" (change)="toggled.emit(toggle.id)" />
+        <!-- The band's own wash is faint, so a rim holds the swatch on the white. -->
+        <span class="size-[0.7rem] flex-none rounded-[2px] shadow-[inset_0_0_0_1px_rgba(15,17,21,0.2)]" [style.background]="toggle.color" aria-hidden="true"></span>
+        <span>{{ toggle.label }}</span>
+      </label>
+    }
+  </div>
+}

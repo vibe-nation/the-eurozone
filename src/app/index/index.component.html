@@ -1,0 +1,149 @@
+<header class="relative border-b border-gray-200 bg-white">
+  <div class="mx-auto flex w-full max-w-[1800px] flex-wrap items-center gap-x-5 gap-y-2 py-3 pr-4 pl-4 sm:pr-16 sm:pl-8 lg:pl-10">
+    <h1 class="inline-flex items-center gap-2.5 text-2xl leading-none font-bold tracking-tight whitespace-nowrap text-ink">
+      <span class="grid size-9 place-items-center rounded-lg bg-euro-blue text-euro-gold" aria-hidden="true"><svg lucideEuro [size]="22" [strokeWidth]="2.5" /></span>
+      Еврозона
+    </h1>
+
+    <app-country-search [countries]="countries" [picked]="searched" (pickedChange)="setSearched($event)" />
+
+    <div class="ml-auto flex flex-wrap items-center gap-2">
+      <app-events-menu [toggles]="eventToggles" (toggled)="toggleRow($event)" />
+      <div class="segmented">
+        <button type="button" class="segmented-option" [class.is-active]="!!switches['labels']" [attr.aria-pressed]="!!switches['labels']" (click)="toggleNumbers()">
+          Покажи числата
+        </button>
+      </div>
+      <div class="segmented">
+        <button type="button" class="segmented-option" [class.is-active]="!!switches['smallPoints']" [attr.aria-pressed]="!!switches['smallPoints']" (click)="toggleSmallPoints()">
+          Малки точки
+        </button>
+      </div>
+      <div class="segmented" role="group" aria-label="Мерна единица">
+        @for (magnitude of magnitudes; track magnitude.value) {
+          <button
+            type="button"
+            class="segmented-option"
+            [class.is-active]="convert.magnitude === magnitude.value"
+            [attr.aria-pressed]="convert.magnitude === magnitude.value"
+            (click)="setMagnitude(magnitude.value)"
+          >
+            {{ magnitude.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="min-w-0 basis-full">
+      <div class="segmented max-w-full gap-0.5 overflow-x-auto" role="group" aria-label="Показатели">
+        @for (metric of metrics; track metric.id) {
+          <button
+            type="button"
+            class="segmented-option"
+            [class.is-active]="activeMetrics.has(metric.id)"
+            [attr.aria-pressed]="activeMetrics.has(metric.id)"
+            (click)="toggleMetric(metric.id)"
+          >
+            {{ metricLabel(metric) }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- The GitHub corner by Tim Holman (github.com/tholman/github-corners, MIT). -->
+  <a class="github-corner" href="https://github.com/vibe-nation/the-eurozone" aria-label="Кодът и данните в GitHub" title="Кодът и данните в GitHub">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+      <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z" />
+      <path
+        class="octo-arm"
+        d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+        fill="currentColor"
+      />
+      <path
+        d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+        fill="currentColor"
+      />
+    </svg>
+  </a>
+</header>
+
+<main class="mx-auto w-full max-w-[1800px] px-4 pt-3 pb-6 sm:px-8 lg:px-10">
+  <div class="@container relative">
+    <div echarts [options]="chart" (chartInit)="onChartInit($event)" (chartClick)="onChartClick($event)" (chartFinished)="updateChartLayout()" class="h-[90vh] min-h-[640px] w-full"></div>
+
+    <aside class="mt-2 flex flex-col @min-[1000px]:absolute @min-[1000px]:inset-y-0 @min-[1000px]:right-0 @min-[1000px]:mt-0 @min-[1000px]:w-44" aria-label="Страни">
+      <div class="flex flex-none items-center justify-between gap-2 border-b border-gray-100 px-2 pb-1.5">
+        <span class="text-[13px] leading-tight font-semibold text-ink">Страни</span>
+        <div class="-mr-1.5 inline-flex items-center gap-0.5">
+          <button
+            type="button"
+            class="cursor-pointer rounded-md px-1.5 py-0.5 text-xs font-semibold text-gray-600 transition-colors enabled:hover:bg-gray-100 enabled:hover:text-ink disabled:cursor-default disabled:text-gray-300"
+            [disabled]="!hiddenCount"
+            title="Покажи всички страни"
+            (click)="showAll(true)"
+          >
+            всички
+          </button>
+          <button
+            type="button"
+            class="cursor-pointer rounded-md px-1.5 py-0.5 text-xs font-semibold text-gray-600 transition-colors enabled:hover:bg-gray-100 enabled:hover:text-ink disabled:cursor-default disabled:text-gray-300"
+            [disabled]="hiddenCount === rows.length"
+            title="Скрий всички страни"
+            (click)="showAll(false)"
+          >
+            никоя
+          </button>
+        </div>
+      </div>
+
+      <ul class="mt-1 flex min-h-0 flex-1 flex-wrap gap-x-1 gap-y-px @min-[1000px]:flex-col @min-[1000px]:flex-nowrap @min-[1000px]:overflow-y-auto">
+        @for (row of rows; track row.name) {
+          <li>
+            <button
+              type="button"
+              class="grid cursor-pointer grid-cols-[22px_minmax(0,1fr)] items-center gap-x-2 rounded-md px-1.5 py-1 text-left transition-colors hover:bg-gray-50 @min-[1000px]:w-full"
+              [attr.aria-pressed]="row.shown"
+              [title]="row.shown ? 'Скрий от графиката' : 'Покажи на графиката'"
+              (click)="toggleCountry(row)"
+              (mouseenter)="highlightRow(row, true)"
+              (mouseleave)="highlightRow(row, false)"
+            >
+              <svg viewBox="0 0 22 12" width="22" height="12" aria-hidden="true" [style.color]="row.shown ? row.color : '#8a93a1'">
+                <line x1="1" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round" [attr.stroke-dasharray]="row.shown ? null : '2 3.5'" />
+                <circle cx="11" cy="6" r="2.8" fill="#fff" stroke="currentColor" stroke-width="2" />
+              </svg>
+              <span class="text-sm leading-tight whitespace-nowrap" [class.text-gray-800]="row.shown" [class.text-gray-500]="!row.shown">{{ row.name }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    </aside>
+  </div>
+</main>
+
+<div class="detail-panel" [class.open]="!!pick || !!point" [inert]="!pick && !point">
+  @if (pick || point) {
+    <button
+      type="button"
+      class="absolute top-2 right-2 z-10 grid size-[1.6rem] cursor-pointer place-items-center rounded-md border border-transparent bg-white/85 text-sm text-slate-400 backdrop-blur-xs transition-colors hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900"
+      aria-label="Затвори"
+      (click)="closePanel()"
+    >
+      ✕
+    </button>
+    <div class="w-[var(--reading-panel-w)] flex-1 overflow-y-auto pt-5 pb-10">
+      @if (pick) {
+        <app-detail-panel
+          [country]="data.timeline.data[pick.rowIndex]"
+          [periodIndex]="pick.periodIndex"
+          [selected]="searched.has(data.timeline.data[pick.rowIndex].id)"
+          (periodSelected)="selectPeriod($event)"
+          (selectionToggled)="toggleSearched(data.timeline.data[pick.rowIndex].id)"
+        />
+      } @else if (point) {
+        <app-point-panel [card]="point" />
+      }
+    </div>
+  }
+</div>

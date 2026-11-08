@@ -1,0 +1,331 @@
+[
+  {
+    "id": "berlin-wall-fall",
+    "meta": {
+      "label": false,
+      "style": {
+        "itemStyle": {
+          "color": "#1d4ed8"
+        }
+      }
+    },
+    "items": [
+      {
+        "name": "Падането на Берлинската стена",
+        "description": "ГДР обявява нови правила за пътуване, а през нощта на 9 срещу 10 ноември граничните пунктове в Берлин се отварят",
+        "value": [
+          "1989-11-09"
+        ],
+        "sources": [
+          {
+            "name": "Opening and fall of the Berlin Wall - Berlin.de",
+            "link": [
+              "https://www.berlin.de/en/history/8482274-8619314-opening-and-fall-of-the-berlin-wall.en.html"
+            ]
+          },
+          {
+            "name": "Dancing on the Wall - deutschland.de",
+            "link": [
+              "https://www.deutschland.de/en/topic/politics/germany-europe/dancing-on-the-wall"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "zhivkov-ousted",
+    "meta": {
+      "label": false,
+      "style": {
+        "itemStyle": {
+          "color": "#1d4ed8"
+        }
+      }
+    },
+    "items": [
+      {
+        "name": "Свалянето на Тодор Живков",
+        "description": "Пленумът на ЦК на БКП освобождава Тодор Живков от поста генерален секретар и избира на негово място Петър Младенов",
+        "value": [
+          "1989-11-10"
+        ],
+        "sources": [
+          {
+            "name": "November 10, 1989: Todor Zhivkov Is Ousted as Bulgarian Communist Party Chief - BTA",
+            "link": [
+              "https://www.bta.bg/en/news/1005141-november-10-1989-todor-zhivkov-is-ousted-as-bulgarian-communist-party-chief"
+            ],
+            "date": "2025-11-10"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "bulgaria-nato",
+    "meta": {
+      "label": false,
+      "style": {
+        "itemStyle": {
+          "color": "#1d4ed8"
+        }
+      }
+    },
+    "items": [
+      {
+        "name": "България става член на НАТО",
+        "description": "България става член на НАТО с депозирането на документите за присъединяване във Вашингтон",
+        "value": [
+          "2004-03-29"
+        ],
+        "sources": [
+          {
+            "name": "Seven new members join NATO - NATO",
+            "link": [
+              "https://www.nato.int/en/news-and-events/articles/news/2004/03/29/seven-new-members-join-nato"
+            ],
+            "date": "2004-03-29"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "bulgaria-eu",
+    "meta": {
+      "label": false,
+      "style": {
+        "itemStyle": {
+          "color": "#1d4ed8"
+        }
+      }
+    },
+    "items": [
+      {
+        "name": "България става член на ЕС",
+        "description": "България става член на Европейския съюз",
+        "value": [
+          "2007-01-01"
+        ],
+        "sources": [
+          {
+            "name": "България — държава от ЕС | Европейски съюз",
+            "link": [
+              "https://european-union.europa.eu/principles-countries-history/country-profiles/bulgaria_bg"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "global-financial-crisis",
+    "meta": {
+      "label": false,
+      "style": {
+        "itemStyle": {
+          "color": "rgba(255, 165, 0, 0.15)"
+        }
+      }
+    },
+    "items": [
+      {
+        "name": "Световна финансова криза",
+        "description": "От фалита на Lehman Brothers до края на рецесията в САЩ",
+        "value": [
+          "2008-09-15",
+          "2009-06-30"
+        ],
+        "sources": [
+          {
+            "name": "Bankruptcy - The Lehman Brothers Collection, Harvard Business School",
+            "link": [
+              "https://www.library.hbs.edu/hc/lehman/exhibition/bankruptcy"
+            ],
+            "date": "2008-09-15"
+          },
+          {
+            "name": "US Business Cycle Expansions and Contractions - NBER",
+            "link": [
+              "https://www.nber.org/research/data/us-business-cycle-expansions-and-contractions"
+            ],
+            "date": "2010-09-20"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "covid",
+    "meta": {
+      "label": false,
+      "style": {
+        "itemStyle": {
+          "color": "rgba(128, 128, 128, 0.2)"
+        }
+      }
+    },
+    "items": [
+      {
+        "name": "COVID",
+        "description": "Пандемия от COVID-19 в България",
+        "value": [
+          "2020-03-13",
+          "2022-03-30"
+        ],
+        "sources": [
+          {
+            "name": "РЕШЕНИЕ за обявяване на извънредно положение",
+            "link": [
+              "https://www.parliament.bg/bg/desision/ID/157374"
+            ],
+            "date": "2020-03-13"
+          },
+          {
+            "name": "Край на извънредното положение - отпадат всички ограничения (ОБЗОР)",
+            "link": [
+              "https://bntnews.bg/news/krai-na-izvanrednoto-polozhenie-otpadat-vsichki-ogranicheniya-obzor-1190146news.html"
+            ],
+            "date": "2022-03-30"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "war-russia-ukraine",
+    "meta": {
+      "label": false,
+      "style": {
+        "itemStyle": {
+          "color": "rgba(255, 0, 0, 0.10)"
+        }
+      }
+    },
+    "items": [
+      {
+        "name": "Войната в Украйна",
+        "value": [
+          "2022-02-24",
+          null
+        ],
+        "sources": [
+          {
+            "name": "Vladimir Putin's Speech on Ukraine and US Foreign Policy and NATO - 24 February 2022, ENG Subtitles",
+            "link": [
+              "https://www.youtube.com/watch?v=1qS6J-WbTD8&t=1222s"
+            ],
+            "date": "2022-02-24"
+          },
+          {
+            "name": "Русия нападна Украйна",
+            "link": [
+              "https://bnr.bg/radiobulgaria/post/101605926/rusia-napadna-ukraina"
+            ],
+            "date": "2022-02-24"
+          },
+          {
+            "name": "РУСКАТА АТАКА В УКРАЙНА: Президентът Путин обяви специална военна операция в Донбас",
+            "link": [
+              "https://www.youtube.com/watch?v=v0kxGOInFaQ"
+            ],
+            "date": "2022-02-24"
+          },
+          {
+            "name": "Войната започна. Русия нападна Украйна",
+            "link": [
+              "https://www.svobodnaevropa.bg/a/31719771.html"
+            ],
+            "date": "2022-02-24"
+          },
+          {
+            "name": "'We will defend ourselves', says Ukrainian president Volodymyr Zelenskiy",
+            "link": [
+              "https://www.youtube.com/watch?v=prfaWHQoxVg"
+            ],
+            "date": "2022-02-24"
+          },
+          {
+            "name": "Archival footage showing the assault on Antonov Airport February 24-25 of 2022. Russian POV",
+            "link": [
+              "https://www.reddit.com/r/CombatFootage/comments/1hzudcn/archival_footage_showing_the_assault_on_antonov/"
+            ],
+            "date": "2022-02-25"
+          },
+          {
+            "name": "Ukrainian President Volodymyr Zelenskyy shares a message from Kyiv ",
+            "link": [
+              "https://www.youtube.com/watch?v=tLv9IqcoNe8"
+            ],
+            "date": "2022-02-25"
+          },
+          {
+            "name": "Vladimir Putin announces partial mobilisation of Russian troops for Ukraine",
+            "link": [
+              "https://www.youtube.com/watch?v=ZCOMTYt1VFI"
+            ],
+            "date": "2022-09-21"
+          },
+          {
+            "name": "Russian invasion of Ukraine: A visual timeline of the war",
+            "link": [
+              "https://www.youtube.com/watch?v=6BvOBW3FwbA"
+            ],
+            "date": "2023-02-22"
+          },
+          {
+            "name": "Documenting Russian Equipment Losses During The Russian Invasion Of Ukraine",
+            "link": [
+              "https://www.oryxspioenkop.com/2022/02/attack-on-europe-documenting-equipment.html"
+            ],
+            "date": "2022-02-24"
+          },
+          {
+            "name": "Documenting Ukrainian Equipment Losses During The Russian Invasion Of Ukraine",
+            "link": [
+              "https://www.oryxspioenkop.com/2022/02/attack-on-europe-documenting-ukrainian.html"
+            ],
+            "date": "2022-02-24"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "war-iran",
+    "meta": {
+      "label": false,
+      "style": {
+        "itemStyle": {
+          "color": "rgba(124, 58, 237, 0.14)"
+        }
+      }
+    },
+    "items": [
+      {
+        "name": "Войната в Иран",
+        "description": "САЩ и Израел започват въздушни удари срещу Иран. Примирието от април 2026 г. не довежда до трайно споразумение и към ноември ограничените удари продължават",
+        "value": [
+          "2026-02-28",
+          null
+        ],
+        "sources": [
+          {
+            "name": "Timeline of the 2026 Iran war - Wikipedia",
+            "link": [
+              "https://en.wikipedia.org/wiki/Timeline_of_the_2026_Iran_war"
+            ]
+          },
+          {
+            "name": "US launches new targeted strikes on Iran as Trump claims progress in talks with Tehran - Euronews",
+            "link": [
+              "https://www.euronews.com/2026/11/07/us-launches-new-targeted-strikes-on-iran-as-trump-claims-progress-in-talks-with-tehran"
+            ],
+            "date": "2026-11-07"
+          }
+        ]
+      }
+    ]
+  }
+]

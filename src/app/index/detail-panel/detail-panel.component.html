@@ -1,0 +1,117 @@
+<div class="px-4 pb-8">
+  <div class="flex items-center gap-2.5 pr-8">
+    <img [src]="'flags/' + flag() + '.svg'" alt="" width="27" height="20" class="flex-none rounded-[2px] ring-1 ring-black/10" />
+    <h2 class="text-[1.35rem] leading-tight font-bold tracking-tight wrap-break-word text-ink">{{ period().name }}</h2>
+  </div>
+  @if (period().name !== country().name) {
+    <p class="mt-1 text-sm font-semibold text-gray-600">{{ country().name }}</p>
+  }
+
+  <button
+    type="button"
+    class="mt-3 inline-flex h-[1.9rem] cursor-pointer items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 text-[13px] whitespace-nowrap text-gray-700 transition-colors hover:border-gray-300 hover:bg-gray-50 hover:text-ink"
+    (click)="selectionToggled.emit()"
+  >
+    @if (selected()) {
+      <svg lucideX [size]="14" aria-hidden="true" />
+      Премахни от избраните
+    } @else {
+      <svg lucidePlus [size]="14" aria-hidden="true" />
+      Добави към избраните
+    }
+  </button>
+
+  <div class="mt-3.5 flex items-baseline justify-between gap-2 border-t border-gray-200 pt-3 text-[0.94rem] leading-snug">
+    <span class="font-semibold text-gray-800 tabular-nums">{{ span().dates }}</span>
+    <span class="whitespace-nowrap text-gray-600">{{ span().duration }}</span>
+  </div>
+
+  @if (currencies().length > 1) {
+    <section class="mt-5">
+      <h3 class="section-title">
+        <button
+          type="button"
+          class="inline-flex cursor-pointer items-center gap-2 transition-colors hover:text-euro-blue"
+          [attr.aria-expanded]="currenciesOpen()"
+          aria-controls="panel-currencies"
+          (click)="currenciesOpen.set(!currenciesOpen())"
+        >
+          <span>Валути</span>
+          <span class="grid h-[1.15rem] min-w-[1.15rem] place-items-center rounded-full bg-gray-100 px-1 text-[0.7rem] font-semibold text-gray-600">{{ currencies().length }}</span>
+          <svg lucideChevronDown [size]="14" class="transition-transform motion-reduce:transition-none" [class.rotate-180]="currenciesOpen()" aria-hidden="true" />
+        </button>
+        <span class="section-title-rule"></span>
+      </h3>
+
+      @if (currenciesOpen()) {
+        <ul id="panel-currencies">
+          @for (row of currencies(); track row.index) {
+            <li>
+              <button
+                type="button"
+                class="grid w-full grid-cols-[auto_1fr] gap-x-2.5 gap-y-px border-b border-gray-100 px-1.5 py-2 text-left transition-colors enabled:cursor-pointer enabled:hover:bg-gray-50 disabled:bg-slate-100"
+                [disabled]="row.index === periodIndex()"
+                (click)="periodSelected.emit(row.index)"
+              >
+                <img [src]="'flags/' + row.flag + '.svg'" alt="" width="18" height="13" class="row-span-2 mt-0.5 rounded-[1px] ring-1 ring-black/10" />
+                <span class="text-[0.82rem] leading-tight font-semibold text-gray-800">{{ row.name }}</span>
+                <span class="flex items-baseline justify-between gap-3 text-[0.8rem] leading-snug text-gray-800 tabular-nums">
+                  <span>{{ row.dates }}</span>
+                  <span class="flex-none whitespace-nowrap">{{ row.duration }}</span>
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
+
+  @if (period().description) {
+    <p class="mt-5 text-[0.94rem] leading-relaxed text-gray-700">{{ period().description }}</p>
+  }
+
+  @if (sources().length) {
+    <section class="mt-5">
+      <h3 class="section-title"><span>Източник</span><span class="section-title-rule"></span></h3>
+      <ng-container *ngTemplateOutlet="sourceItem; context: { $implicit: sources()[0] }" />
+    </section>
+  }
+
+  @if (sources().length > 1) {
+    <section class="mt-5">
+      <h3 class="section-title"><span>Други източници и контекст</span><span class="section-title-rule"></span></h3>
+      <div class="space-y-5">
+        @for (row of sources().slice(1); track row.url + row.name) {
+          <ng-container *ngTemplateOutlet="sourceItem; context: { $implicit: row }" />
+        }
+      </div>
+    </section>
+  }
+</div>
+
+<ng-template #sourceItem let-row>
+  <article class="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-x-3">
+    <span class="mt-0.5 grid size-6 place-items-center rounded-md bg-slate-100 text-gray-600" aria-hidden="true">
+      @if (row.isWiki) {
+        <svg lucideBookOpen [size]="13" />
+      } @else {
+        <svg lucideGlobe [size]="13" />
+      }
+    </span>
+    <div>
+      @if (row.quote) {
+        <div class="border-l-2 border-gray-300 pl-3">
+          <p class="text-[0.94rem] leading-relaxed text-gray-800">„{{ row.quote }}“</p>
+          @if (row.quoteOriginal) {
+            <p class="mt-1 text-[0.8rem] leading-snug text-gray-500 italic">„{{ row.quoteOriginal }}“</p>
+          }
+        </div>
+      }
+      <a [href]="row.url" target="_blank" rel="noopener" class="mt-2 inline-flex items-center gap-1 text-sm text-gray-800 transition-colors hover:text-euro-blue">
+        {{ row.name }}<svg lucideArrowUpRight [size]="13" aria-hidden="true" />
+      </a>
+      <p class="mt-0.5 text-[0.8rem] text-gray-500">{{ row.site }}</p>
+    </div>
+  </article>
+</ng-template>

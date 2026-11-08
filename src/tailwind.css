@@ -1,0 +1,195 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Sofia Sans', ui-sans-serif, system-ui, sans-serif;
+  --color-euro-blue: #003399;
+  --color-euro-gold: #ffcc00;
+  --color-ink: #0f1115;
+}
+
+@layer base {
+  html {
+    @apply bg-white text-gray-900 antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-euro-blue;
+  }
+}
+
+@layer components {
+  .segmented {
+    @apply inline-flex h-[1.9rem] rounded-full border border-gray-200 bg-white p-0.5;
+  }
+
+  .segmented-option {
+    @apply flex-none cursor-pointer rounded-full px-2.5 text-[13px] whitespace-nowrap text-gray-600 transition-colors hover:text-ink;
+  }
+
+  .segmented-option.is-active {
+    @apply bg-ink text-white hover:text-white;
+  }
+
+  .search-field {
+    @apply flex h-[1.9rem] cursor-text items-center gap-1.5 rounded-full border border-gray-400 bg-white pr-1 pl-2.5 text-gray-700 focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-ink;
+  }
+
+  .search-field.is-miss {
+    @apply border-red-500;
+  }
+
+  .search-input {
+    @apply min-w-0 flex-auto bg-transparent text-[13px] text-ink outline-none placeholder:text-gray-600;
+  }
+
+  /* Touch browsers zoom the page to a field set under 16px. */
+  @media (pointer: coarse) {
+    .search-input {
+      @apply text-base;
+    }
+  }
+
+  .search-count {
+    @apply flex-none text-xs whitespace-nowrap text-gray-600 tabular-nums;
+  }
+
+  .search-field.is-miss .search-count {
+    @apply text-red-700;
+  }
+
+  .search-clear {
+    @apply size-[1.3rem] flex-none cursor-pointer rounded-full text-[11px] leading-none text-gray-600 hover:bg-gray-100 hover:text-ink;
+  }
+
+  .search-list {
+    @apply absolute top-[calc(100%+0.3rem)] left-0 z-30 max-h-88 w-full min-w-56 overflow-y-auto rounded-[0.85rem] border border-gray-200 bg-white p-1 shadow-[0_1px_2px_rgba(15,17,21,0.06),0_12px_28px_-12px_rgba(15,17,21,0.3)];
+  }
+
+  .search-list-head {
+    @apply flex items-baseline justify-between gap-4 px-2 pt-1.5 pb-1 text-[13px] font-semibold text-gray-400;
+  }
+
+  .search-list-forget {
+    @apply flex-none cursor-pointer font-[inherit] hover:text-ink;
+  }
+
+  .search-list-divider {
+    @apply mx-2 mt-1 mb-1.5 border-t border-gray-100;
+  }
+
+  /* Hover and the arrow keys share one state: there is never a second cursor. */
+  .search-option {
+    @apply flex w-full cursor-pointer items-center gap-2 rounded-[0.6rem] px-2 py-1 text-left text-sm leading-tight text-gray-700;
+  }
+
+  .search-option.is-active {
+    @apply bg-gray-100 text-ink;
+  }
+
+  .search-option.is-picked {
+    @apply text-ink;
+  }
+
+  .search-option-check {
+    @apply inline-flex size-[0.95rem] flex-none items-center justify-center rounded-[0.3rem] border border-gray-300 text-transparent;
+  }
+
+  .search-option.is-picked .search-option-check {
+    @apply border-ink bg-ink text-white;
+  }
+
+  .events-trigger {
+    @apply inline-flex h-[1.9rem] cursor-pointer items-center gap-1.5 rounded-full border border-gray-200 bg-white px-2.5 text-[13px] whitespace-nowrap text-ink;
+  }
+
+  .events-panel {
+    @apply absolute top-[calc(100%+0.3rem)] left-0 z-30 max-h-72 w-max max-w-[min(22rem,calc(100vw-2rem))] min-w-56 overflow-y-auto rounded-lg border border-gray-200 bg-white p-1 shadow-[0_8px_24px_rgba(0,0,0,0.1)];
+  }
+
+  .events-item {
+    @apply flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-[13px] leading-tight text-gray-700 hover:bg-gray-50 hover:text-ink;
+  }
+
+  .section-title {
+    @apply mb-3 flex items-center gap-3 text-[0.95rem] font-bold text-ink;
+  }
+
+  .section-title-rule {
+    @apply h-px flex-1 bg-gray-200;
+  }
+
+  .detail-panel {
+    @apply fixed top-0 right-0 z-200 flex h-dvh w-0 flex-col overflow-hidden bg-white transition-[width] duration-300 motion-reduce:transition-none;
+  }
+
+  .detail-panel.open {
+    @apply border-l border-slate-200 shadow-[-8px_0_24px_rgba(0,0,0,0.06)];
+    width: var(--reading-panel-w);
+  }
+
+  .github-corner {
+    @apply absolute top-0 right-0 z-10 size-14 leading-none text-white;
+  }
+
+  .github-corner svg {
+    @apply size-full fill-ink;
+  }
+
+  .github-corner .octo-arm {
+    transform-origin: 130px 106px;
+  }
+
+  .github-corner:hover .octo-arm {
+    animation: octocat-wave 560ms ease-in-out;
+  }
+
+  .site-footer {
+    @apply mx-auto flex w-full max-w-[1800px] flex-col items-center gap-4 px-4 pt-6 pb-8 text-center text-sm text-gray-600 sm:px-8 lg:px-10;
+  }
+
+  .site-footer a {
+    @apply text-ink transition-colors hover:text-gray-600;
+  }
+}
+
+@keyframes octocat-wave {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  20%,
+  60% {
+    transform: rotate(-25deg);
+  }
+  40%,
+  80% {
+    transform: rotate(10deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .github-corner:hover .octo-arm {
+    animation: none;
+  }
+}
+
+/* The footer is static html: held back until the app is in place above it, or it flashes at the top. */
+app-root:empty + .site-footer {
+  visibility: hidden;
+}
+
+:root {
+  --reading-panel-w: min(580px, 100vw);
+}
+
+/* The panel pushes the page aside, so the chart stays whole beside it. */
+body:has(.detail-panel.open) {
+  margin-right: var(--reading-panel-w);
+}
+
+/* On a phone the panel covers the chart: pushing would leave nothing beside it. */
+@media (max-width: 768px) {
+  body:has(.detail-panel.open) {
+    margin-right: 0;
+  }
+}
